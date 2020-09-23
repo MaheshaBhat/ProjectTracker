@@ -1,23 +1,22 @@
-import React, { useCallback, useState } from "react";
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import React, { useCallback, useState, useContext, useEffect } from "react";
 import {
   View,
   TextInput,
-  Image,
   StyleSheet,
   TouchableOpacity,
   Text,
 } from "react-native";
-import { _storeData } from "../functions/SecureStore";
-import email from "../assets/images/email_icon.jpg";
-import password from "../assets/images/password_icon.png";
-import google from "../assets/images/google_icon.png";
-import facebook from "../assets/images/facebook_icon.png";
+import { _storeData, _retrieveData } from "../functions/SecureStore";
+import { MaterialIcons, EvilIcons, Entypo } from "@expo/vector-icons";
 import { HOST_URL } from "../constants/Values";
+import AuthContext from "../context/AuthContext";
 
-const Signin = (props: any) => {
-  const [Email, setEmail] = useState("cinisusan2010@gmail.com");
-  const [Password, setPassword] = useState("Cini@123");
+const Signin = () => {
+  const [Email, setEmail] = useState("");
+  const [Password, setPassword] = useState("");
   const [Val, setVal] = useState("");
+  const setAuth = useContext(AuthContext)?.setAuth;
 
   const emailHandler = useCallback((text: string) => {
     setEmail(text);
@@ -25,6 +24,16 @@ const Signin = (props: any) => {
 
   const passwordHandler = useCallback((text: string) => {
     setPassword(text);
+  }, []);
+
+  useEffect(() => {
+    async function getCredentials() {
+      const username = await _retrieveData("username");
+      const password = await _retrieveData("password");
+      setEmail(username ? username : "");
+      setPassword(password ? password : "");
+    }
+    getCredentials();
   }, []);
 
   const loginPressHandler = useCallback(async () => {
@@ -35,7 +44,7 @@ const Signin = (props: any) => {
     } else {
       //const link = `${await HOST_URL()}/api/Login`;
       console.log(await HOST_URL());
-      const link='http://192.168.111.110:3000/api/login';
+      const link = "http://192.168.111.110:3000/api/login";
       fetch(encodeURI(link), {
         method: "post",
         headers: { "Content-Type": "application/json" },
@@ -44,15 +53,18 @@ const Signin = (props: any) => {
           password: Password,
         }),
       })
-        .then((response: any) => {
+        .then((response) => {
           //console.log(response);
-          response.text().then((data: string) => {
+          response.text().then(async (data: string) => {
             //console.log(data);
             if (data === "logged in") {
-              const auth_token = response.headers.map["auth-token"];
+              const auth_token = response.headers.get("auth-token");
               setVal("");
-              _storeData("token", auth_token ? auth_token : "");
-              props.navigation.navigate("Root");
+              await _storeData("username", Email);
+              await _storeData("password", Password);
+              await _storeData("token", auth_token ? auth_token : "");
+              //props.navigation.navigate("Root");
+              setAuth(true);
             } else {
               //console.log(data);
               setVal(data);
@@ -60,7 +72,7 @@ const Signin = (props: any) => {
           });
         })
 
-        .catch((err) => {
+        .catch(() => {
           //console.log(err);
         });
     }
@@ -70,7 +82,13 @@ const Signin = (props: any) => {
     <View style={styles.container}>
       <Text style={styles.heading}>Sign in</Text>
       <View style={styles.inputContainer}>
-        <Image source={email} style={styles.icons} />
+        <MaterialIcons
+          name="email"
+          size={24}
+          color="black"
+          style={styles.icons}
+        />
+
         <TextInput
           value={Email}
           style={styles.input}
@@ -79,7 +97,7 @@ const Signin = (props: any) => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Image source={password} style={styles.icons} />
+        <Entypo name="lock" size={24} color="black" style={styles.icons} />
         <TextInput
           value={Password}
           style={styles.input}
@@ -108,11 +126,21 @@ const Signin = (props: any) => {
       <Text style={styles.validationMessage}>{Val}</Text>
       <Text style={styles.greyText}>or with one of these services</Text>
       <TouchableOpacity style={[{ backgroundColor: "#d54c3f" }, styles.button]}>
-        <Image source={google} style={styles.icons} />
+        <EvilIcons
+          name="sc-google-plus"
+          size={24}
+          color="white"
+          style={styles.icons}
+        />
         <Text style={styles.buttonText}>Sign in With Google</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[{ backgroundColor: "#3a559f" }, styles.button]}>
-        <Image source={facebook} style={styles.icons} />
+        <EvilIcons
+          name="sc-facebook"
+          size={24}
+          color="white"
+          style={styles.icons}
+        />
         <Text style={styles.buttonText}>Sign in With Facebook</Text>
       </TouchableOpacity>
       <Text
@@ -147,9 +175,7 @@ const styles = StyleSheet.create({
     height: "7%",
   },
   icons: {
-    height: 15,
-    width: 15,
-    marginRight: 10,
+    marginRight: "2%",
   },
   buttonText: {
     color: "white",

@@ -17,12 +17,12 @@ export default {
           },
           TabTwo: {
             screens: {
-              TabTwoScreen: 'two',
+              ProjectScreen: 'Project',
             },
           },
           TabThree: {
             screens: {
-              TabThreeScreen: 'three',
+              MyTaskScreen: 'three',
             },
           },
           TabFour: {

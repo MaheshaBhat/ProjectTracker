@@ -1,15 +1,25 @@
+import { StackNavigationProp } from "@react-navigation/stack";
+
 export type RootStackParamList = {
-  Landing: undefined;
   Root: undefined;
   NotFound: undefined;
-  Signup:undefined;
-  Signin:undefined;
-  Home:undefined;
+  Signup: undefined;
+  Signin: undefined;
+  Home: undefined;
+};
+
+export type AuthStackParamList = {
+  Landing: undefined;
+  NotFound: undefined;
+  Signup: undefined;
+  Signin: undefined;
 };
 
 export type BottomTabParamList = {
   TabOne: undefined;
-  TabTwo: undefined;
+  Projects: undefined;
+  Tasks: undefined;
+  TabFour: undefined;
 };
 
 export type TabOneParamList = {
@@ -17,15 +27,18 @@ export type TabOneParamList = {
 };
 
 export type TabTwoParamList = {
-  TabTwoScreen: undefined;
+  ProjectScreen: undefined;
 };
 
 export type TabThreeParamList = {
-  TabThreeScreen: undefined;
+  MyTaskScreen: undefined;
 };
-
 
 export type TabFourParamList = {
   TabFourScreen: undefined;
 };
 
+export type AuthScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  "Signup"
+>;
